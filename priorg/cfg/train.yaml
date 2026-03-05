@@ -1,0 +1,8 @@
+defaults:
+  - benchmark
+  - condition_mask_fn: structured_random
+  - _self_
+
+task:
+  name: two_moons
+  num_simulations: 10000

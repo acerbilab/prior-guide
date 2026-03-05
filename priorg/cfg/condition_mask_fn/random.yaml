@@ -1,0 +1,12 @@
+# @package method.train.condition_mask_fn
+name: random
+alpha: 1.0
+beta: 4.0
+# Set unused structured_random parameters to null
+p_joint: null
+p_posterior: null
+p_likelihood: null
+p_rnd1: null
+p_rnd2: null
+rnd1_prob: null
+rnd2_prob: null

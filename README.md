@@ -1,12 +1,72 @@
 # PriorGuide: Test-Time Prior Adaptation for Simulation-Based Inference
-Repository for the paper “PriorGuide: Test-Time Prior Adaptation for Simulation-Based Inference” (Yang et al., 2025).
-
-Code coming soon — currently under preparation.
+Repository for the paper “[PriorGuide: Test-Time Prior Adaptation for Simulation-Based Inference](https://openreview.net/forum?id=G4I23g5Ugh)” (Yang et al., ICLR 2026).
 
 ---
 
-## Abstract
-> Amortized simulator-based inference offers a powerful framework for tackling Bayesian inference in computational fields such as engineering or neuroscience, increasingly leveraging modern generative methods like diffusion models to map observed data to model parameters or future predictions. These approaches yield posterior or posterior-predictive samples for new datasets without requiring further simulator calls after training on simulated parameter-data pairs. 
-However, their applicability is often limited by the prior distribution(s) used to generate model parameters during this training phase. To overcome this constraint, we introduce *PriorGuide*, a technique specifically designed for diffusion-based amortized inference methods. PriorGuide leverages a novel guidance approximation that enables flexible adaptation of the trained diffusion model to new priors at test time, crucially without costly retraining. This allows users to readily incorporate updated information or expert knowledge post-training, enhancing the versatility of pre-trained inference models.
+## Installation
+Clone the repository. Create an virtual environment and install the dependencies. This codebase has been verified to run on Python 3.10.
+```bash
+git clone https://github.com/acerbilab/prior-guide.git
+cd prior-guide
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Training
+To train a base diffusion model:
+```bash
+python -m priorg.train task.name=<task> task.num_simulations=10000 seed=<seed>
+```
+
+Replace `<task>` with one of the following supported task names:
+
+- `oup`
+- `two_moons`
+- `turin`
+- `gaussian_linear`
+- `gaussian_linear_high`
+- `bav` (for the BCI task in the paper)
+
+For example, to train the OUP model with a seed value of `0`, run:
+
+```bash
+python -m priorg.train task.name=oup task.num_simulations=10000 seed=0
+```
+The training configuration can be found in `priorg/cfg/train.yaml`
+
+## Experiments
+To replicate our experiments, check the scripts under `experiments`.
+#### Test-Time Prior Generations
+```bash
+# Uniform training priors
+python experiments/data/priors/gen_priors_uniform.py --task <task>
+# Gaussian training priors
+python experiments/data/priors/gen_priors_gaussian.py --task <task>
+```
+#### Posterior Inference
+```bash
+# Uniform training priors
+python experiments/posterior/run_prior_guide_uniform.py --task <task>
+# Gaussian training priors
+python experiments/posterior/run_prior_guide_gaussian.py --task <task>
+```
+#### Posterior Predictive Inference
+```bash
+python experiments/posterior_predictive/run_prior_guide.py --task <task>
+```
+
+## Citation
+If you find this work useful, please consider citing our paper:
+```
+@inproceedings{yang2026priorguide,
+  title={PriorGuide: Test-Time Prior Adaptation for Simulation-Based Inference},
+  author={Yang Yang and Severi Rissanen and Paul Edmund Chang and Nasrulloh Ratu Bagus Satrio Loka and Daolang Huang and Arno Solin and Markus Heinonen and Luigi Acerbi},
+  booktitle={The Fourteenth International Conference on Learning Representations},
+  year={2026},
+  url={https://openreview.net/forum?id=G4I23g5Ugh}
+}
+```
+
 
 ---

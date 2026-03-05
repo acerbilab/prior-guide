@@ -1,0 +1,74 @@
+name: benchmark
+seed: 0
+model_id: null
+save_model: true
+save_summary: true
+method:
+  model:
+    token_dim: 40
+    condition_token_dim: 10
+    condition_token_init_scale: 0.1
+    condition_token_init_mean: 0.0
+    condition_mode: concat
+    time_embedding_dim: 128
+    num_heads: 4
+    num_layers: 6
+    attn_size: 10
+    widening_factor: 3
+    num_hidden_layers: 1
+    skip_connection_attn: true
+    skip_connection_mlp: true
+    layer_norm: true
+  train:
+    condition_mask_fn:
+      name: structured_random  # Conditioning strategy for multi-conditional training [methods.py:run_score_transformer, loss_fn]
+    edge_mask_fn:
+      name: none  # Graph edge masking strategy for transformer attention [methods.py:run_score_transformer, loss_fn]
+    max_number_steps: 100000  # Maximum number of training steps [methods.py:run_score_transformer]
+    min_number_steps: 5000  # Minimum number of training steps [methods.py:run_score_transformer] DEPRECATED
+    total_number_steps_scaling: 3  # Scales training steps based on dataset size [methods.py:] DEPRECATED
+    training_batch_size: 1000  # Batch size for model training [methods.py:run_score_transformer]
+    learning_rate: 0.001  # Initial learning rate for optimizer [methods.py:run_score_transformer]
+    min_learning_rate: 1.0e-06  # Minimum learning rate for linear scheduler [methods.py:run_score_transformer]
+    clip_max_norm: 10.0  # Gradient clipping threshold for stable training [methods.py:run_score_transformer, optax.adaptive_grad_clip]
+    validation_fraction: 0.05  # Fraction of data used for validation [methods.py:run_train_transformer_model]
+    val_repeat: 5  # Number of validation repeats for Monte Carlo estimation [methods.py:run_train_transformer_model]
+    val_every: 50  # Frequency of validation checks (as fraction of total steps) [methods.py:run_score_transformer]
+    stop_early_count: 5  # Number of deteriorations before early stopping [methods.py:run_train_transformer_model]
+    rebalance_loss: false  # Whether to rebalance loss based on conditioning pattern [methods.py:loss_fn, loss_fn.py:denoising_score_matching_loss]
+    z_score_data: false  # Whether to normalize data using z-score [methods.py:run_score_transformer, mean_std_per_node_id]
+  sde:
+    name: vesde
+    sigma_max: 15.0
+    sigma_min: 0.0001
+    T_max: 1.0
+    T_min: 1.0e-05
+    scale_min: 0.001
+  posterior:
+    sampling_method: sde
+    num_steps: 500
+    method: euler_maruyama
+  name: score_transformer
+  backend: jax
+  device: gpu
+task:
+  name: two_moons
+  num_simulations: 10000
+eval:
+  metric:
+    n_folds: 5
+    metric: accuracy
+    classifier: rf
+    condition_mask_fn: posterior
+    num_samples: 2000
+    num_evaluations: 50
+partition: {}
+sweeper:
+  name: null
+  objective: null
+hydra:
+  run:
+    dir: results/${task.name}/${method.train.condition_mask_fn.name}/${now:%Y-%m-%d_%H-%M-%S}_${hydra.job.override_dirname}
+  sweep:
+    dir: results/${task.name}/${method.train.condition_mask_fn.name}/${now:%Y-%m-%d_%H-%M-%S}_${hydra.job.override_dirname}
+    subdir: ${hydra.job.override_dirname}

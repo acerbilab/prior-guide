@@ -1,0 +1,12 @@
+# @package method.train.condition_mask_fn
+name: joint
+# Set unused parameters to null
+p_joint: null
+p_posterior: null
+p_likelihood: null
+p_rnd1: null
+p_rnd2: null
+rnd1_prob: null
+rnd2_prob: null
+alpha: null
+beta: null
